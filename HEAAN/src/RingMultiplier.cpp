@@ -256,7 +256,6 @@ void RingMultiplier::reconstruct(ZZ* x, uint64_t* rx, long np, ZZ& mod) {
 		QuickRem(x[n], mod);
 	}
 	NTL_EXEC_RANGE_END;
-
 }
 
 void RingMultiplier::mult(ZZ* x, ZZ* a, ZZ* b, long np, ZZ& mod) {

@@ -28,10 +28,6 @@ public:
 
 	Plaintext(ZZ* mx = NULL, long logp = 0, long logq = 0, long N = 1, long n = 1);
 
-	Plaintext(const Plaintext& o);
-
-	Plaintext& operator=(const Plaintext &o);
-
 	virtual ~Plaintext();
 };
 

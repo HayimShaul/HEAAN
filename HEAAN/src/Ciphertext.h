@@ -15,31 +15,24 @@
 using namespace std;
 using namespace NTL;
 
-/**
- * Ciphertext is an RLWE instance (ax, bx = mx + ex - ax * sx) in the ring Z_q[X] / (X^N + 1)
- */
 class Ciphertext {
 public:
 
-	ZZ* ax; ///< a(x) - part of RLWE instance
-	ZZ* bx; ///< b(x) - part of RLWE instance
+	ZZ* ax;
+	ZZ* bx;
 
-	long logp; ///< number of message quantized bits
-	long logq; ///< number of modulus bits
+	long logp;
+	long logq;
 
-	long N; ///< degree of RLWE
-	long n; ///< number of slots
+	long N;
+	long n;
 
 	Ciphertext(ZZ* ax = NULL, ZZ* bx = NULL, long logp = 0, long logq = 0, long N = 0, long n = 0);
 
-	Ciphertext(const Ciphertext& o);
-
-	Ciphertext& operator=(const Ciphertext &o);
+	Ciphertext(const Ciphertext* o);
 
 	virtual ~Ciphertext();
 	
-	void kill();
-
 };
 
 #endif

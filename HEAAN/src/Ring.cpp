@@ -129,7 +129,7 @@ void Ring::EMBInv(complex<double>* vals, long n) {
 }
 
 void Ring::encode(ZZ* mx, double* vals, long slots, long logp) {
-	complex<double>* uvals = new complex<double> [slots];
+	complex<double>* uvals = new complex<double>[slots];
 	long i, jdx, idx;
 	for (i = 0; i < slots; ++i) {
 		uvals[i].real(vals[i]);
@@ -325,7 +325,7 @@ void Ring::addBootContext(long logSlots, long logp) {
 		}
 		delete[] pvals;
 		delete[] pvec;
-		bootContextMap.insert(pair<long, BootContext>(logSlots,BootContext(rpvec, rpvecInv, rp1, rp2, bndvec, bndvecInv, bnd1, bnd2, logp)));
+		bootContextMap.insert(pair<long, BootContext*>(logSlots,new BootContext(rpvec, rpvecInv, rp1, rp2, bndvec, bndvecInv, bnd1, bnd2, logp)));
 	}
 }
 

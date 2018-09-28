@@ -34,9 +34,9 @@ void TestScheme::testEncrypt(long logN, long logQ, long logp, long logn) {
 	cout << "!!! START TEST ENCODE BATCH !!!" << endl;
 	//-----------------------------------------
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
 	//-----------------------------------------
 	srand(time(NULL));
 	//-----------------------------------------
@@ -44,11 +44,11 @@ void TestScheme::testEncrypt(long logN, long logQ, long logp, long logn) {
 	complex<double>* mvec = EvaluatorUtils::randomComplexArray(n);
 
 	timeutils.start("Encrypt");
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 	timeutils.stop("Encrypt");
 
 	timeutils.start("Decrypt");
-	complex<double>* dvec = scheme.decrypt(secretKey, cipher);
+	complex<double>* dvec = scheme->decrypt(secretKey, cipher);
 	timeutils.stop("Decrypt");
 
 	StringUtils::compare(mvec, dvec, n, "val");
@@ -60,20 +60,20 @@ void TestScheme::testEncryptSingle(long logN, long logQ, long logp) {
 	cout << "!!! START TEST ENCODE SINGLE !!!" << endl;
 	//-----------------------------------------
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
 	//-----------------------------------------
 	srand(time(NULL));
 	//-----------------------------------------
 	complex<double> mval = EvaluatorUtils::randomComplex();
 
 	timeutils.start("Encrypt Single");
-	Ciphertext cipher = scheme.encryptSingle(mval, logp, logQ);
+	Ciphertext* cipher = scheme->encryptSingle(mval, logp, logQ);
 	timeutils.stop("Encrypt Single");
 
 	timeutils.start("Decrypt Single");
-	complex<double> dval = scheme.decryptSingle(secretKey, cipher);
+	complex<double> dval = scheme->decryptSingle(secretKey, cipher);
 	timeutils.stop("Decrypt Single");
 
 	StringUtils::compare(mval, dval, "val");
@@ -87,9 +87,9 @@ void TestScheme::testBasic(long logN, long logQ, long logp, long logn) {
 	srand(time(NULL));
 	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
 
 	long n = (1 << logn);
 	complex<double>* mvec1 = EvaluatorUtils::randomComplexArray(n);
@@ -105,26 +105,26 @@ void TestScheme::testBasic(long logN, long logQ, long logp, long logn) {
 		mcmult[i] = mvec1[i] * cvec[0].real();
 	}
 
-	Ciphertext cipher1 = scheme.encrypt(mvec1, n, logp, logQ);
-	Ciphertext cipher2 = scheme.encrypt(mvec2, n, logp, logQ);
+	Ciphertext* cipher1 = scheme->encrypt(mvec1, n, logp, logQ);
+	Ciphertext* cipher2 = scheme->encrypt(mvec2, n, logp, logQ);
 
 	timeutils.start("Addition");
-	Ciphertext cadd = scheme.add(cipher1, cipher2);
+	Ciphertext* cadd = scheme->add(cipher1, cipher2);
 	timeutils.stop("Addition");
 
 	timeutils.start("Multiplication & Rescaling");
-	Ciphertext cmult = scheme.mult(cipher1, cipher2);
-	scheme.reScaleByAndEqual(cmult, logp);
+	Ciphertext* cmult = scheme->mult(cipher1, cipher2);
+	scheme->reScaleByAndEqual(cmult, logp);
 	timeutils.stop("Multiplication & Rescaling");
 
 	timeutils.start("Constant Multiplication & Rescaling");
-	Ciphertext ccmult = scheme.multByConst(cipher1, cvec[0], logp);
-	scheme.reScaleByAndEqual(ccmult, logp);
+	Ciphertext* ccmult = scheme->multByConst(cipher1, cvec[0], logp);
+	scheme->reScaleByAndEqual(ccmult, logp);
 	timeutils.stop("Constant Multiplication & Rescaling");
 
-	complex<double>* dadd = scheme.decrypt(secretKey, cadd);
-	complex<double>* dmult = scheme.decrypt(secretKey, cmult);
-	complex<double>* dcmult = scheme.decrypt(secretKey, ccmult);
+	complex<double>* dadd = scheme->decrypt(secretKey, cadd);
+	complex<double>* dmult = scheme->decrypt(secretKey, cmult);
+	complex<double>* dcmult = scheme->decrypt(secretKey, ccmult);
 
 	StringUtils::compare(madd, dadd, n, "add");
 	StringUtils::compare(mmult, dmult, n, "mult");
@@ -139,9 +139,9 @@ void TestScheme::testimult(long logN, long logQ, long logp, long logn) {
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
 
 	long n = (1 << logn);
 
@@ -152,13 +152,13 @@ void TestScheme::testimult(long logN, long logQ, long logp, long logn) {
 		imvec[i].imag(mvec[i].real());
 	}
 
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start("Multiplication by i");
-	Ciphertext icipher = scheme.imult(cipher);
+	Ciphertext* icipher = scheme->imult(cipher);
 	timeutils.stop("Multiplication by i");
 
-	complex<double>* idvec = scheme.decrypt(secretKey, icipher);
+	complex<double>* idvec = scheme->decrypt(secretKey, icipher);
 	StringUtils::compare(imvec, idvec, n, "imult");
 
 	cout << "!!! END TEST i MULTIPLICATION !!!" << endl;
@@ -176,21 +176,21 @@ void TestScheme::testRotateFast(long logN, long logQ, long logp, long logn, long
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring, true);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
 
 	long n = (1 << logn);
 	long r = (1 << logr);
-	scheme.addLeftRotKey(secretKey, r);
+	scheme->addLeftRotKey(secretKey, r);
 	complex<double>* mvec = EvaluatorUtils::randomComplexArray(n);
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start("Left Rotate Fast");
-	scheme.leftRotateFastAndEqual(cipher, r);
+	scheme->leftRotateFastAndEqual(cipher, r);
 	timeutils.stop("Left Rotate Fast");
 
-	complex<double>* dvec = scheme.decrypt(secretKey, cipher);
+	complex<double>* dvec = scheme->decrypt(secretKey, cipher);
 	EvaluatorUtils::leftRotateAndEqual(mvec, n, r);
 	StringUtils::compare(mvec, dvec, n, "rot");
 
@@ -203,21 +203,21 @@ void TestScheme::testRotate(long logN, long logQ, long logp, long logn, long r) 
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	scheme.addLeftRotKeys(secretKey);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	scheme->addLeftRotKeys(secretKey);
 
 	long n = (1 << logn);
 
 	complex<double>* mvec = EvaluatorUtils::randomComplexArray(n);
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start("Left rotate batch");
-	scheme.leftRotateAndEqual(cipher, r);
+	scheme->leftRotateAndEqual(cipher, r);
 	timeutils.stop("Left rotate batch");
 
-	complex<double>* dvec = scheme.decrypt(secretKey, cipher);
+	complex<double>* dvec = scheme->decrypt(secretKey, cipher);
 	EvaluatorUtils::leftRotateAndEqual(mvec, n, r);
 	StringUtils::compare(mvec, dvec, n, "rot");
 
@@ -230,10 +230,10 @@ void TestScheme::testConjugate(long logN, long logQ, long logp, long logn) {
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	scheme.addConjKey(secretKey);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	scheme->addConjKey(secretKey);
 
 	long n = (1 << logn);
 
@@ -243,13 +243,13 @@ void TestScheme::testConjugate(long logN, long logQ, long logp, long logn) {
 		mvecconj[i] = conj(mvec[i]);
 	}
 
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start("Conjugate");
-	Ciphertext cconj = scheme.conjugate(cipher);
+	Ciphertext* cconj = scheme->conjugate(cipher);
 	timeutils.stop("Conjugate");
 
-	complex<double>* dvecconj = scheme.decrypt(secretKey, cconj);
+	complex<double>* dvecconj = scheme->decrypt(secretKey, cconj);
 	StringUtils::compare(mvecconj, dvecconj, n, "conj");
 
 	cout << "!!! END TEST CONJUGATE !!!" << endl;
@@ -267,10 +267,10 @@ void TestScheme::testPowerOf2(long logN, long logQ, long logp, long logn, long l
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long n = 1 << logn;
 	long degree = 1 << logdeg;
@@ -281,13 +281,13 @@ void TestScheme::testPowerOf2(long logN, long logQ, long logp, long logn, long l
 		mpow[i] = pow(mvec[i], degree);
 	}
 
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start("Power of 2");
-	Ciphertext cpow = algo.powerOf2(cipher, logp, logdeg);
+	Ciphertext* cpow = algo->powerOf2(cipher, logp, logdeg);
 	timeutils.stop("Power of 2");
 
-	complex<double>* dpow = scheme.decrypt(secretKey, cpow);
+	complex<double>* dpow = scheme->decrypt(secretKey, cpow);
 	StringUtils::compare(mpow, dpow, n, "pow2");
 
 	cout << "!!! END TEST POWER OF 2 !!!" << endl;
@@ -301,10 +301,10 @@ void TestScheme::testPower(long logN, long logQ, long logp, long logn, long degr
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long n = 1 << logn;
 	complex<double>* mvec = EvaluatorUtils::randomCircleArray(n);
@@ -313,13 +313,13 @@ void TestScheme::testPower(long logN, long logQ, long logp, long logn, long degr
 		mpow[i] = pow(mvec[i], degree);
 	}
 
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start("Power");
-	Ciphertext cpow = algo.power(cipher, logp, degree);
+	Ciphertext* cpow = algo->power(cipher, logp, degree);
 	timeutils.stop("Power");
 
-	complex<double>* dpow = scheme.decrypt(secretKey, cpow);
+	complex<double>* dpow = scheme->decrypt(secretKey, cpow);
 	StringUtils::compare(mpow, dpow, n, "pow");
 
 	cout << "!!! END TEST POWER !!!" << endl;
@@ -333,10 +333,10 @@ void TestScheme::testProdOfPo2(long logN, long logQ, long logp, long logn, long 
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long n = 1 << logn;
 	long degree = 1 << logdeg;
@@ -352,16 +352,16 @@ void TestScheme::testProdOfPo2(long logN, long logQ, long logp, long logn, long 
 			pvec[j] *= mvec[i][j];
 		}
 	}
-	Ciphertext* cvec = new Ciphertext[degree];
+	Ciphertext** cvec = new Ciphertext*[degree];
 	for (long i = 0; i < degree; ++i) {
-		cvec[i] = scheme.encrypt(mvec[i], n, logp, logQ);
+		cvec[i] = scheme->encrypt(mvec[i], n, logp, logQ);
 	}
 
 	timeutils.start("Product of power of 2");
-	Ciphertext cprod = algo.prodOfPo2(cvec, logp, logdeg);
+	Ciphertext* cprod = algo->prodOfPo2(cvec, logp, logdeg);
 	timeutils.stop("Product of power of 2");
 
-	complex<double>* dvec = scheme.decrypt(secretKey, cprod);
+	complex<double>* dvec = scheme->decrypt(secretKey, cprod);
 
 	StringUtils::compare(pvec, dvec, n, "prod");
 
@@ -374,10 +374,10 @@ void TestScheme::testProd(long logN, long logQ, long logp, long logn, long degre
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long n = 1 << logn;
 	complex<double>** mvec = new complex<double>*[degree];
@@ -391,16 +391,16 @@ void TestScheme::testProd(long logN, long logQ, long logp, long logn, long degre
 			pvec[j] *= mvec[i][j];
 		}
 	}
-	Ciphertext* cvec = new Ciphertext[degree];
+	Ciphertext** cvec = new Ciphertext*[degree];
 	for (long i = 0; i < degree; ++i) {
-		cvec[i] = scheme.encrypt(mvec[i], n, logp, logQ);
+		cvec[i] = scheme->encrypt(mvec[i], n, logp, logQ);
 	}
 
 	timeutils.start("Product");
-	Ciphertext cprod = algo.prod(cvec, logp, degree);
+	Ciphertext* cprod = algo->prod(cvec, logp, degree);
 	timeutils.stop("Product");
 
-	complex<double>* dvec = scheme.decrypt(secretKey, cprod);
+	complex<double>* dvec = scheme->decrypt(secretKey, cprod);
 	StringUtils::compare(pvec, dvec, n, "prod");
 
 	cout << "!!! END TEST PROD !!!" << endl;
@@ -416,12 +416,12 @@ void TestScheme::testInverse(long logN, long logQ, long logp, long logn, long st
 	cout << "!!! START TEST INVERSE !!!" << endl;
 
 	srand(time(NULL));
-//	SetNumThreads(8);
+	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long n = 1 << logn;
 	complex<double>* mvec = EvaluatorUtils::randomCircleArray(n, 0.1);
@@ -430,13 +430,13 @@ void TestScheme::testInverse(long logN, long logQ, long logp, long logn, long st
 		minv[i] = 1. / mvec[i];
 	}
 
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start("Inverse");
-	Ciphertext cinv = algo.inverse(cipher, logp, steps);
+	Ciphertext* cinv = algo->inverse(cipher, logp, steps);
 	timeutils.stop("Inverse");
 
-	complex<double>* dinv = scheme.decrypt(secretKey, cinv);
+	complex<double>* dinv = scheme->decrypt(secretKey, cinv);
 	StringUtils::compare(minv, dinv, n, "inv");
 
 	cout << "!!! END TEST INVERSE !!!" << endl;
@@ -448,10 +448,10 @@ void TestScheme::testLogarithm(long logN, long logQ, long logp, long logn, long 
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long n = 1 << logn;
 	complex<double>* mvec = EvaluatorUtils::randomComplexArray(n, 0.1);
@@ -460,13 +460,13 @@ void TestScheme::testLogarithm(long logN, long logQ, long logp, long logn, long 
 		mlog[i] = log(mvec[i] + 1.);
 	}
 
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start(LOGARITHM);
-	Ciphertext clog = algo.function(cipher, LOGARITHM, logp, degree);
+	Ciphertext* clog = algo->function(cipher, LOGARITHM, logp, degree);
 	timeutils.stop(LOGARITHM);
 
-	complex<double>* dlog = scheme.decrypt(secretKey, clog);
+	complex<double>* dlog = scheme->decrypt(secretKey, clog);
 	StringUtils::compare(mlog, dlog, n, LOGARITHM);
 
 	cout << "!!! END TEST LOGARITHM !!!" << endl;
@@ -478,10 +478,10 @@ void TestScheme::testExponent(long logN, long logQ, long logp, long logn, long d
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long n = 1 << logn;
 	complex<double>* mvec = EvaluatorUtils::randomComplexArray(n);
@@ -490,13 +490,13 @@ void TestScheme::testExponent(long logN, long logQ, long logp, long logn, long d
 		mexp[i] = exp(mvec[i]);
 	}
 
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start(EXPONENT);
-	Ciphertext cexp = algo.function(cipher, EXPONENT, logp, degree);
+	Ciphertext* cexp = algo->function(cipher, EXPONENT, logp, degree);
 	timeutils.stop(EXPONENT);
 
-	complex<double>* dexp = scheme.decrypt(secretKey, cexp);
+	complex<double>* dexp = scheme->decrypt(secretKey, cexp);
 	StringUtils::compare(mexp, dexp, n, EXPONENT);
 
 	cout << "!!! END TEST EXPONENT !!!" << endl;
@@ -508,10 +508,10 @@ void TestScheme::testExponentLazy(long logN, long logQ, long logp, long logn, lo
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long n = 1 << logn;
 	complex<double>* mvec = EvaluatorUtils::randomComplexArray(n);
@@ -519,13 +519,13 @@ void TestScheme::testExponentLazy(long logN, long logQ, long logp, long logn, lo
 	for (long i = 0; i < n; ++i) {
 		mexp[i] = exp(mvec[i]);
 	}
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start(EXPONENT + " lazy");
-	Ciphertext cexp = algo.functionLazy(cipher, EXPONENT, logp, degree);
+	Ciphertext* cexp = algo->functionLazy(cipher, EXPONENT, logp, degree);
 	timeutils.stop(EXPONENT + " lazy");
 
-	complex<double>* dexp = scheme.decrypt(secretKey, cexp);
+	complex<double>* dexp = scheme->decrypt(secretKey, cexp);
 	StringUtils::compare(mexp, dexp, n, EXPONENT);
 
 	cout << "!!! END TEST EXPONENT LAZY !!!" << endl;
@@ -539,10 +539,10 @@ void TestScheme::testSigmoid(long logN, long logQ, long logp, long logn, long de
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long n = 1 << logn;
 
@@ -552,13 +552,13 @@ void TestScheme::testSigmoid(long logN, long logQ, long logp, long logn, long de
 		msig[i] = exp(mvec[i]) / (1. + exp(mvec[i]));
 	}
 
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start(SIGMOID);
-	Ciphertext csig = algo.function(cipher, SIGMOID, logp, degree);
+	Ciphertext* csig = algo->function(cipher, SIGMOID, logp, degree);
 	timeutils.stop(SIGMOID);
 
-	complex<double>* dsig = scheme.decrypt(secretKey, csig);
+	complex<double>* dsig = scheme->decrypt(secretKey, csig);
 	StringUtils::compare(msig, dsig, n, SIGMOID);
 
 	cout << "!!! END TEST SIGMOID !!!" << endl;
@@ -570,10 +570,10 @@ void TestScheme::testSigmoidLazy(long logN, long logQ, long logp, long logn, lon
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long n = 1 << logn;
 	complex<double>* mvec = EvaluatorUtils::randomComplexArray(n);
@@ -582,13 +582,13 @@ void TestScheme::testSigmoidLazy(long logN, long logQ, long logp, long logn, lon
 		msig[i] = exp(mvec[i]) / (1. + exp(mvec[i]));
 	}
 
-	Ciphertext cipher = scheme.encrypt(mvec, n, logp, logQ);
+	Ciphertext* cipher = scheme->encrypt(mvec, n, logp, logQ);
 
 	timeutils.start(SIGMOID + " lazy");
-	Ciphertext csig = algo.functionLazy(cipher, SIGMOID, logp, degree);
+	Ciphertext* csig = algo->functionLazy(cipher, SIGMOID, logp, degree);
 	timeutils.stop(SIGMOID + " lazy");
 
-	complex<double>* dsig = scheme.decrypt(secretKey, csig);
+	complex<double>* dsig = scheme->decrypt(secretKey, csig);
 	StringUtils::compare(msig, dsig, n, SIGMOID);
 
 	cout << "!!! END TEST SIGMOID LAZY !!!" << endl;
@@ -606,10 +606,10 @@ void TestScheme::testDFTBatch(long logN, long logQ, long logp, long logn, long l
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long dim = 1 << logdim;
 	long n = 1 << logn;
@@ -620,8 +620,8 @@ void TestScheme::testDFTBatch(long logN, long logQ, long logp, long logn, long l
 		mvec2[i] = EvaluatorUtils::randomComplexArray(dim);
 	}
 
-	Ciphertext* cvec1 = new Ciphertext[dim];
-	Ciphertext* cvec2 = new Ciphertext[dim];
+	Ciphertext** cvec1 = new Ciphertext*[dim];
+	Ciphertext** cvec2 = new Ciphertext*[dim];
 	for (long j = 0; j < dim; ++j) {
 		complex<double>* mvals1 = new complex<double>[n];
 		complex<double>* mvals2	= new complex<double>[n];
@@ -629,42 +629,42 @@ void TestScheme::testDFTBatch(long logN, long logQ, long logp, long logn, long l
 			mvals1[i] = mvec1[i][j];
 			mvals2[i] = mvec2[i][j];
 		}
-		cvec1[j] = scheme.encrypt(mvals1, n, logp, logQ);
-		cvec2[j] = scheme.encrypt(mvals2, n, logp, logQ);
+		cvec1[j] = scheme->encrypt(mvals1, n, logp, logQ);
+		cvec2[j] = scheme->encrypt(mvals2, n, logp, logQ);
 		delete[] mvals1;
 		delete[] mvals2;
 	}
 
 	for (long i = 0; i < n; ++i) {
-		ring.DFT(mvec1[i], dim);
-		ring.DFT(mvec2[i], dim);
+		ring->DFT(mvec1[i], dim);
+		ring->DFT(mvec2[i], dim);
 		for (long j = 0; j < dim; ++j) {
 			mvec1[i][j] *= mvec2[i][j];
 		}
-		ring.IDFT(mvec1[i], dim);
+		ring->IDFT(mvec1[i], dim);
 	}
 
 	timeutils.start("DFT 1");
-	algo.DFT(cvec1, dim);
+	algo->DFT(cvec1, dim);
 	timeutils.stop("DFT 1");
 
 	timeutils.start("DFT 2");
-	algo.DFT(cvec2, dim);
+	algo->DFT(cvec2, dim);
 	timeutils.stop("DFT 2");
 
 	timeutils.start("Hadamard Mult");
-	algo.multModSwitchAndEqualVec(cvec1, cvec2, logp, dim);
+	algo->multModSwitchAndEqualVec(cvec1, cvec2, logp, dim);
 	timeutils.stop("Hadamard Mult");
 
 	delete[] cvec2;
 
 	timeutils.start("IDFT");
-	algo.IDFT(cvec1, dim);
+	algo->IDFT(cvec1, dim);
 	timeutils.stop("IDFT");
 
 	complex<double>** dvec1 = new complex<double>*[dim];
 	for (long j = 0; j < dim; ++j) {
-		dvec1[j] = scheme.decrypt(secretKey, cvec1[j]);
+		dvec1[j] = scheme->decrypt(secretKey, cvec1[j]);
 	}
 	for (long i = 0; i < n; ++i) {
 		for (long j = 0; j < dim; ++j) {
@@ -681,10 +681,10 @@ void TestScheme::testDFTLazyBatch(long logN, long logQ, long logp, long logn, lo
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long dim = 1 << logdim;
 	long n = 1 << logn;
@@ -695,8 +695,8 @@ void TestScheme::testDFTLazyBatch(long logN, long logQ, long logp, long logn, lo
 		mvec2[i] = EvaluatorUtils::randomComplexArray(dim);
 	}
 
-	Ciphertext* cvec1 = new Ciphertext[dim];
-	Ciphertext* cvec2 = new Ciphertext[dim];
+	Ciphertext** cvec1 = new Ciphertext*[dim];
+	Ciphertext** cvec2 = new Ciphertext*[dim];
 	for (long j = 0; j < dim; ++j) {
 		complex<double>* mvals1 = new complex<double>[n];
 		complex<double>* mvals2	= new complex<double>[n];
@@ -704,42 +704,42 @@ void TestScheme::testDFTLazyBatch(long logN, long logQ, long logp, long logn, lo
 			mvals1[i] = mvec1[i][j];
 			mvals2[i] = mvec2[i][j];
 		}
-		cvec1[j] = scheme.encrypt(mvals1, n, logp, logQ);
-		cvec2[j] = scheme.encrypt(mvals2, n, logp, logQ);
+		cvec1[j] = scheme->encrypt(mvals1, n, logp, logQ);
+		cvec2[j] = scheme->encrypt(mvals2, n, logp, logQ);
 		delete[] mvals1;
 		delete[] mvals2;
 	}
 
 	for (long i = 0; i < n; ++i) {
-		ring.DFT(mvec1[i], dim);
-		ring.DFT(mvec2[i], dim);
+		ring->DFT(mvec1[i], dim);
+		ring->DFT(mvec2[i], dim);
 		for (long j = 0; j < dim; ++j) {
 			mvec1[i][j] *= mvec2[i][j];
 		}
-		ring.IDFTLazy(mvec1[i], dim);
+		ring->IDFTLazy(mvec1[i], dim);
 	}
 
 	timeutils.start("DFT 1");
-	algo.DFT(cvec1, dim);
+	algo->DFT(cvec1, dim);
 	timeutils.stop("DFT 1");
 
 	timeutils.start("DFT 2");
-	algo.DFT(cvec2, dim);
+	algo->DFT(cvec2, dim);
 	timeutils.stop("DFT 2");
 
 	timeutils.start("Hadamard Mult");
-	algo.multModSwitchAndEqualVec(cvec1, cvec2, logp, dim);
+	algo->multModSwitchAndEqualVec(cvec1, cvec2, logp, dim);
 	timeutils.stop("Hadamard Mult");
 
 	delete[] cvec2;
 
 	timeutils.start("IDFT Lazy");
-	algo.IDFTLazy(cvec1, dim);
+	algo->IDFTLazy(cvec1, dim);
 	timeutils.stop("IDFT Lazy");
 
 	complex<double>** dvec1 = new complex<double>*[dim];
 	for (long j = 0; j < dim; ++j) {
-		dvec1[j] = scheme.decrypt(secretKey, cvec1[j]);
+		dvec1[j] = scheme->decrypt(secretKey, cvec1[j]);
 	}
 	for (long i = 0; i < n; ++i) {
 		for (long j = 0; j < dim; ++j) {
@@ -756,33 +756,33 @@ void TestScheme::testDFTLazyBatchMultipleHadamard(long logN, long logQ, long log
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
-	SchemeAlgo algo(scheme);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
+	SchemeAlgo* algo = new SchemeAlgo(scheme);
 
 	long dim = 1 << logdim;
 	long hdim = 1 << logh;
 	long n = 1 << logn;
 	complex<double>*** mvecs = new complex<double>**[hdim];
-	Ciphertext** cvecs = new Ciphertext*[hdim];
+	Ciphertext*** cvecs = new Ciphertext**[hdim];
 	for (long h = 0; h < hdim; ++h) {
 		mvecs[h] = new complex<double>*[n];
 		for (long i = 0; i < n; ++i) {
 			mvecs[h][i] = EvaluatorUtils::randomComplexArray(dim);
 		}
 
-		cvecs[h] = new Ciphertext[dim];
+		cvecs[h] = new Ciphertext*[dim];
 		for (long j = 0; j < dim; ++j) {
 			complex<double>* mvals = new complex<double>[n];
 			for (long i = 0; i < n; ++i) {
 				mvals[i] = mvecs[h][i][j];
 			}
-			cvecs[h][j] = scheme.encrypt(mvals, n, logp, logQ);
+			cvecs[h][j] = scheme->encrypt(mvals, n, logp, logQ);
 			delete[] mvals;
 		}
 		for (long i = 0; i < n; ++i) {
-			ring.DFT(mvecs[h][i], dim);
+			ring->DFT(mvecs[h][i], dim);
 		}
 	}
 
@@ -798,7 +798,7 @@ void TestScheme::testDFTLazyBatchMultipleHadamard(long logN, long logQ, long log
 	}
 
 	for (long i = 0; i < n; ++i) {
-		ring.IDFTLazy(mvecs[0][i], dim);
+		ring->IDFTLazy(mvecs[0][i], dim);
 	}
 
 	for (long h = 1; h < hdim; ++h) {
@@ -810,7 +810,7 @@ void TestScheme::testDFTLazyBatchMultipleHadamard(long logN, long logQ, long log
 
 	timeutils.start("DFT");
 	for (long h = 0; h < hdim; ++h) {
-		algo.DFT(cvecs[h], dim);
+		algo->DFT(cvecs[h], dim);
 	}
 	timeutils.stop("DFT");
 
@@ -818,19 +818,19 @@ void TestScheme::testDFTLazyBatchMultipleHadamard(long logN, long logQ, long log
 	for (long s = logh - 1; s >= 0; --s) {
 		long spow = 1 << s;
 		for (long h = 0; h < spow; ++h) {
-			algo.multModSwitchAndEqualVec(cvecs[h], cvecs[h+spow], logp, dim);
+			algo->multModSwitchAndEqualVec(cvecs[h], cvecs[h+spow], logp, dim);
 			delete[] cvecs[h+spow];
 		}
 	}
 	timeutils.stop("Hadamard Mult");
 
 	timeutils.start("IDFT Lazy");
-	algo.IDFTLazy(cvecs[0], dim);
+	algo->IDFTLazy(cvecs[0], dim);
 	timeutils.stop("IDFT Lazy");
 
 	complex<double>** dvec = new complex<double>*[dim];
 	for (long j = 0; j < dim; ++j) {
-		dvec[j] = scheme.decrypt(secretKey, cvecs[0][j]);
+		dvec[j] = scheme->decrypt(secretKey, cvecs[0][j]);
 	}
 	for (long i = 0; i < n; ++i) {
 		for (long j = 0; j < dim; ++j) {
@@ -854,50 +854,50 @@ void TestScheme::testBootstrap(long logN, long logp, long logq, long logQ, long 
 	srand(time(NULL));
 	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
 
 	timeutils.start("Key generating");
-	scheme.addBootKey(secretKey, logSlots, logq + 4);
+	scheme->addBootKey(secretKey, logSlots, logq + 4);
 	timeutils.stop("Key generated");
 
 	long slots = (1 << logSlots);
 	complex<double>* mvec = EvaluatorUtils::randomComplexArray(slots);
 
-	Ciphertext cipher = scheme.encrypt(mvec, slots, logp, logq);
+	Ciphertext* cipher = scheme->encrypt(mvec, slots, logp, logq);
 
-	cout << "cipher logq before: " << cipher.logq << endl;
+	cout << "cipher logq before: " << cipher->logq << endl;
 
-	scheme.modDownToAndEqual(cipher, logq);
-	scheme.normalizeAndEqual(cipher);
-	cipher.logq = logQ;
-	cipher.logp = logq + 4;
+	scheme->modDownToAndEqual(cipher, logq);
+	scheme->normalizeAndEqual(cipher);
+	cipher->logq = logQ;
+	cipher->logp = logq + 4;
 
 	timeutils.start("SubSum");
-	for (long i = logSlots; i < ring.logNh; ++i) {
-		Ciphertext rot = scheme.leftRotateFast(cipher, (1 << i));
-		scheme.addAndEqual(cipher, rot);
+	for (long i = logSlots; i < ring->logNh; ++i) {
+		Ciphertext* rot = scheme->leftRotateFast(cipher, (1 << i));
+		scheme->addAndEqual(cipher, rot);
 	}
-	scheme.divByPo2AndEqual(cipher, ring.logNh);
+	scheme->divByPo2AndEqual(cipher, ring->logNh);
 	timeutils.stop("SubSum");
 
 	timeutils.start("CoeffToSlot");
-	scheme.coeffToSlotAndEqual(cipher);
+	scheme->coeffToSlotAndEqual(cipher);
 	timeutils.stop("CoeffToSlot");
 
 	timeutils.start("EvalExp");
-	scheme.evalExpAndEqual(cipher, logT);
+	scheme->evalExpAndEqual(cipher, logT);
 	timeutils.stop("EvalExp");
 
 	timeutils.start("SlotToCoeff");
-	scheme.slotToCoeffAndEqual(cipher);
+	scheme->slotToCoeffAndEqual(cipher);
 	timeutils.stop("SlotToCoeff");
 
-	cipher.logp = logp;
-	cout << "cipher logq after: " << cipher.logq << endl;
+	cipher->logp = logp;
+	cout << "cipher logq after: " << cipher->logq << endl;
 
-	complex<double>* dvec = scheme.decrypt(secretKey, cipher);
+	complex<double>* dvec = scheme->decrypt(secretKey, cipher);
 
 	StringUtils::compare(mvec, dvec, slots, "boot");
 
@@ -910,41 +910,41 @@ void TestScheme::testBootstrapSingleReal(long logN, long logp, long logq, long l
 	srand(time(NULL));
 //	SetNumThreads(8);
 	TimeUtils timeutils;
-	Ring ring(logN, logQ);
-	SecretKey secretKey(ring);
-	Scheme scheme(secretKey, ring);
+	Ring* ring = new Ring(logN, logQ);
+	SecretKey* secretKey = new SecretKey(ring);
+	Scheme* scheme = new Scheme(secretKey, ring);
 
 	timeutils.start("Key generating");
-	scheme.addBootKey(secretKey, 0, logq + 4);
+	scheme->addBootKey(secretKey, 0, logq + 4);
 	timeutils.stop("Key generated");
 
 	double mval = EvaluatorUtils::randomReal();
 
-	Ciphertext cipher = scheme.encryptSingle(mval, logp, logq);
+	Ciphertext* cipher = scheme->encryptSingle(mval, logp, logq);
 
-	cout << "cipher logq before: " << cipher.logq << endl;
-	scheme.modDownToAndEqual(cipher, logq);
-	scheme.normalizeAndEqual(cipher);
-	cipher.logq = logQ;
+	cout << "cipher logq before: " << cipher->logq << endl;
+	scheme->modDownToAndEqual(cipher, logq);
+	scheme->normalizeAndEqual(cipher);
+	cipher->logq = logQ;
 
 	timeutils.start("SubSum");
-	for (long i = 0; i < ring.logNh; ++i) {
-		Ciphertext rot = scheme.leftRotateFast(cipher, 1 << i);
-		scheme.addAndEqual(cipher, rot);
+	for (long i = 0; i < ring->logNh; ++i) {
+		Ciphertext* rot = scheme->leftRotateFast(cipher, 1 << i);
+		scheme->addAndEqual(cipher, rot);
 	}
-	Ciphertext cconj = scheme.conjugate(cipher);
-	scheme.addAndEqual(cipher, cconj);
-	scheme.divByPo2AndEqual(cipher, ring.logN);
+	Ciphertext* cconj = scheme->conjugate(cipher);
+	scheme->addAndEqual(cipher, cconj);
+	scheme->divByPo2AndEqual(cipher, ring->logN);
 	timeutils.stop("SubSum");
 
 	timeutils.start("EvalExp");
-	scheme.evalExpAndEqual(cipher, logT);
+	scheme->evalExpAndEqual(cipher, logT);
 	timeutils.stop("EvalExp");
 
-	cout << "cipher logq after: " << cipher.logq << endl;
+	cout << "cipher logq after: " << cipher->logq << endl;
 
-	cipher.logp = logp;
-	complex<double> dval = scheme.decryptSingle(secretKey, cipher);
+	cipher->logp = logp;
+	complex<double> dval = scheme->decryptSingle(secretKey, cipher);
 
 	StringUtils::compare(mval, dval.real(), "boot");
 

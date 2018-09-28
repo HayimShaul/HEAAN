@@ -40,10 +40,10 @@ public:
 	double sigma; ///< standard deviation for Gaussian distribution
 	long h; ///< parameter for HWT distribution
 
-	long logQQ; ///< log of PQ
+	long logQQ; ///< log of QQ
 
 	ZZ Q; ///< Q corresponds to the highest modulus
-	ZZ QQ; ///< PQ = Q * Q
+	ZZ QQ; ///< QQ = Q * Q
 
 	ZZ* qpows;
 
@@ -52,7 +52,7 @@ public:
 
 	map<string, double*> taylorCoeffsMap;
 
-	map<long, BootContext> bootContextMap;
+	map<long, BootContext*> bootContextMap;
 
 	RingMultiplier multiplier;
 

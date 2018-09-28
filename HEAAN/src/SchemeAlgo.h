@@ -20,9 +20,9 @@
 
 class SchemeAlgo {
 public:
-	Scheme& scheme;
+	Scheme* scheme;
 
-	SchemeAlgo(Scheme& scheme) : scheme(scheme) {};
+	SchemeAlgo(Scheme* scheme) : scheme(scheme) {};
 
 
 	//----------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ public:
 	 * @param[in] size: array size
 	 * @return [ciphertext(m_1), ciphertext(m_2),...,ciphertext(m_size)]
 	 */
-	Ciphertext* encryptSingleArray(complex<double>* vals, long size, long logp);
+	Ciphertext** encryptSingleArray(complex<double>* vals, long size, long logp);
 
 	/**
 	 * decrypting array of ciphertexts with single value encrypted in each
@@ -45,7 +45,7 @@ public:
 	 * @param[in] size: array size
 	 * @return [m_1, m_2,...,m_size]
 	 */
-	complex<double>* decryptSingleArray(SecretKey& secretKey, Ciphertext* ciphers, long size);
+	complex<double>* decryptSingleArray(SecretKey* secretKey, Ciphertext** ciphers, long size);
 
 
 	//----------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ public:
 	 * @param[in] logDegree: log of degree
 	 * @return ciphertext(m^degree)
 	 */
-	Ciphertext powerOf2(Ciphertext& cipher, const long precisionBits, const long logDegree);
+	Ciphertext* powerOf2(Ciphertext* cipher, long precisionBits, long logDegree);
 
 	/**
 	 * Calculating and storing all power of 2 ciphertexts up to degree, degree is a power-of-two
@@ -69,7 +69,7 @@ public:
 	 * @param[in] logDegree: log of degree
 	 * @return [ciphertext(m), ciphertext(m^2), ciphertext(m^4), ... , ciphertext(m^degree)]
 	 */
-	Ciphertext* powerOf2Extended(Ciphertext& cipher, const long logp, const long logDegree);
+	Ciphertext** powerOf2Extended(Ciphertext* cipher, long logp, long logDegree);
 
 	/**
 	 * Calculating power of ciphertext
@@ -78,7 +78,7 @@ public:
 	 * @param[in] degree: power degree
 	 * @return ciphertext(m^degree)
 	 */
-	Ciphertext power(Ciphertext& cipher, const long logp, const long degree);
+	Ciphertext* power(Ciphertext* cipher, long logp, long degree);
 
 	/**
 	 * Calculating and storing powers of ciphertext up to degree
@@ -87,7 +87,7 @@ public:
 	 * @param[in] degree: power degree
 	 * @return [ciphertext(m), ciphertext(m^2), ... , ciphertext(m^degree)]
 	 */
-	Ciphertext* powerExtended(Ciphertext& cipher, const long logp, const long degree);
+	Ciphertext** powerExtended(Ciphertext* cipher, long logp, long degree);
 
 	/**
 	 * Calculating product of ciphertexts, degree is a power-of-two
@@ -96,7 +96,7 @@ public:
 	 * @param[in] logDegree: log of degree
 	 * @return ciphertext(m_1 * m_2 *...*m_{degree})
 	 */
-	Ciphertext prodOfPo2(Ciphertext* ciphers, const long logp, const long logDegree);
+	Ciphertext* prodOfPo2(Ciphertext** ciphers, long logp, long logDegree);
 
 	/**
 	 * Calculating product of ciphertexts
@@ -105,7 +105,7 @@ public:
 	 * @param[in] degree: array size
 	 * @return ciphertext(m_1 * m_2 *...*m_{degree})
 	 */
-	Ciphertext prod(Ciphertext* ciphers, const long logp, const long degree);
+	Ciphertext* prod(Ciphertext** ciphers, long logp, long degree);
 
 
 	//----------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ public:
 	 * @param[in] size: array size
 	 * @return ciphertext(m_1 + m_2 + ... + m_size)
 	 */
-	Ciphertext sum(Ciphertext* ciphers, const long size);
+	Ciphertext* sum(Ciphertext** ciphers, long size);
 
 	/**
 	 * Calculating distance of vectors encrypted in ciphertexts
@@ -127,7 +127,7 @@ public:
 	 * @param[in] cipher2: ciphertext(m'_1, m'_2, ..., m'_slots)
 	 * @return ciphertext(sum((m_i-m'_i)^2) >> logp)
 	 */
-	Ciphertext distance(Ciphertext& cipher1, Ciphertext& cipher2, const long logp);
+	Ciphertext* distance(Ciphertext* cipher1, Ciphertext* cipher2, long logp);
 
 	/**
 	 * Pairwise ciphertexts multiplication
@@ -136,7 +136,7 @@ public:
 	 * @param[in] size: array size
 	 * @return [ciphertext(m_1 * n_1), ciphertext(m_2 * n_2),...,ciphertext(m_size * n_size)]
 	 */
-	Ciphertext* multVec(Ciphertext* ciphers1, Ciphertext* ciphers2, const long size);
+	Ciphertext** multVec(Ciphertext** ciphers1, Ciphertext** ciphers2, long size);
 
 	/**
 	 * Pairwise ciphertexts multiplication
@@ -144,7 +144,7 @@ public:
 	 * @param[in] ciphers2: [ciphertext(n_1), ciphertext(n_2),...,ciphertext(n_size)]
 	 * @param[in] size: array size
 	 */
-	void multAndEqualVec(Ciphertext* ciphers1, Ciphertext* ciphers2, const long size);
+	void multAndEqualVec(Ciphertext** ciphers1, Ciphertext** ciphers2, long size);
 
 	/**
 	 * Pairwise ciphers multiplication and modulus switching
@@ -155,7 +155,7 @@ public:
 	 * @param[in] size: array size
 	 * @return [ciphertext(m_1 * n_1 / p), ciphertext(m_2 * n_2 / p),...,ciphertext(m_size * n_size / p)]
 	 */
-	Ciphertext* multAndModSwitchVec(Ciphertext* ciphers1, Ciphertext* ciphers2, const long logp, const long size);
+	Ciphertext** multAndModSwitchVec(Ciphertext** ciphers1, Ciphertext** ciphers2, long logp, long size);
 
 	/**
 	 * Pairwise ciphertexts multiplication and modulus switching
@@ -164,7 +164,7 @@ public:
 	 * @param[in] logp: log of precision
 	 * @param[in] size: array size
 	 */
-	void multModSwitchAndEqualVec(Ciphertext* ciphers1, Ciphertext* ciphers2, const long logp, const long size);
+	void multModSwitchAndEqualVec(Ciphertext** ciphers1, Ciphertext** ciphers2, long logp, long size);
 
 	/**
 	 * Calculating inner product of ciphertexts
@@ -174,7 +174,7 @@ public:
 	 * @param[in] size: array size
 	 * @return ciphertext(m_1 * n_1 + m_2 * n_2 + ... + m_size * n_size)
 	 */
-	Ciphertext innerProd(Ciphertext* ciphers1, Ciphertext* ciphers2, const long logp, const long size);
+	Ciphertext* innerProd(Ciphertext** ciphers1, Ciphertext** ciphers2, long logp, long size);
 
 	/**
 	 * Calculating ciphertext of partial sums
@@ -183,14 +183,14 @@ public:
 	 * @return ciphertext(m_1 + ... + m_slots, m_2 + ... + m_{slots + 1},...,m_size + m_1 + ... + m_{slots - 1})
 	 *
 	 */
-	Ciphertext partialSlotsSum(Ciphertext& cipher, const long slots);
+	Ciphertext* partialSlotsSum(Ciphertext* cipher, long slots);
 
 	/**
 	 * Calculating ciphertext of partial sums
 	 * @param[in, out] cipher: ciphertext(m_1, m_2,..., m_size) -> ciphertext(m_1 + ... + m_slots, m_2 + ... + m_{slots + 1},...,m_size + m_1 + ... + m_{slots - 1})
 	 * @param[in] slots: number of slots summed in partial sums
 	 */
-	void partialSlotsSumAndEqual(Ciphertext& cipher, const long slots);
+	void partialSlotsSumAndEqual(Ciphertext* cipher, long slots);
 
 
 	//----------------------------------------------------------------------------------
@@ -205,7 +205,7 @@ public:
 	 * @param[in] steps: number of steps in approximation
 	 * @return cipher(1 / m << (2 * logp))
 	 */
-	Ciphertext inverse(Ciphertext& cipher, long logp, long steps);
+	Ciphertext* inverse(Ciphertext* cipher, long logp, long steps);
 
 	/**
 	 * Calculating and storing inverse of a ciphertext at each step up to steps
@@ -214,7 +214,7 @@ public:
 	 * @param[in] steps: number of steps in approximation
 	 * @return [cipher(1 / m << (2 * logp)), ... ,cipher(1 / m << (2 * logp))]
 	 */
-	Ciphertext* inverseExtended(Ciphertext& cipher, const long logp, const long steps);
+	Ciphertext** inverseExtended(Ciphertext* cipher, long logp, long steps);
 
 	/**
 	 * Calculating function using Taylor Series approximation
@@ -224,7 +224,7 @@ public:
 	 * @param[in] degree: taylor approximation degree
 	 * @return ciphertext(funcName(m))
 	 */
-	Ciphertext function(Ciphertext& cipher, string& funcName, const long logp, const long degree);
+	Ciphertext* function(Ciphertext* cipher, string& funcName, long logp, long degree);
 
 	/**
 	 * Calculating function using Taylor Series approximation
@@ -234,7 +234,7 @@ public:
 	 * @param[in] degree: taylor approximation degree
 	 * @return ciphertext(funcName(m) * p), but saves level
 	 */
-	Ciphertext functionLazy(Ciphertext& cipher, string& funcName, const long logp, const long degree);
+	Ciphertext* functionLazy(Ciphertext* cipher, string& funcName, long logp, long degree);
 
 	/**
 	 * Calculating function using Taylor Series approximation, and storing intermediate results
@@ -244,7 +244,7 @@ public:
 	 * @param[in] degree: taylor approximation degree
 	 * @return [ciphertext(funcName(m)), ... ,ciphertext(funcName(m))]
 	 */
-	Ciphertext* functionExtended(Ciphertext& cipher, string& funcName, const long logp, const long degree);
+	Ciphertext** functionExtended(Ciphertext* cipher, string& funcName, long logp, long degree);
 
 
 	//----------------------------------------------------------------------------------
@@ -259,14 +259,14 @@ public:
 	 * @param[in] isForward: switching between fft and fft inverse
 	 * @return [ciphertext(fft_1), ... ,ciphertext(fft_size)]
 	 */
-	void fftRaw(Ciphertext* ciphers, const long size, const bool isForward);
+	void fftRaw(Ciphertext** ciphers, long size, bool isForward);
 
 	/**
 	 * Calculating fft of ciphertexts
 	 * @param[in] [ciphertext(m_1), ciphertext(m_2),...,ciphertext(m_size)]
 	 * @return [ciphertext(fft_1), ... ,ciphertext(fft_size)]
 	 */
-	void DFT(Ciphertext* ciphers, const long size);
+	void DFT(Ciphertext** ciphers, long size);
 
 	/**
 	 * Calculating fft inverse of ciphertexts
@@ -274,7 +274,7 @@ public:
 	 * @param[in] size: array size (power-of-two)
 	 * @return [ciphertext(fftinv_1), ... ,ciphertext(fftinv_size)]
 	 */
-	void IDFT(Ciphertext* ciphers, const long size);
+	void IDFT(Ciphertext** ciphers, long size);
 
 	/**
 	 * Calculating fft inverse of ciphertexts
@@ -282,7 +282,7 @@ public:
 	 * @param[in] size: array size (power-of-two)
 	 * @return [ciphertext(fftinv_1 * size), ... ,ciphertext(fftinv_size * size)] but saves level
 	 */
-	void IDFTLazy(Ciphertext* ciphers, const long size);
+	void IDFTLazy(Ciphertext** ciphers, long size);
 
 };
 
