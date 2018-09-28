@@ -132,8 +132,8 @@ void TestScheme::testBasic(long logN, long logQ, long logp, long logn) {
 
 	cout << "!!! END TEST BASIC !!!" << endl;
 
-	cipher1.kill(); cipher2.kill();
-	cadd.kill(); cmult.kill(); ccmult.kill();
+	delete cipher1; delete cipher2;
+	delete cadd; delete cmult; delete ccmult;
 
 	delete[] dadd; delete[] dmult; delete[] dcmult;
 }
