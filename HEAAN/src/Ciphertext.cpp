@@ -15,16 +15,30 @@ Ciphertext::Ciphertext(ZZ* ax, ZZ* bx, long logp, long logq, long N, long n) :
 
 }
 
-Ciphertext::Ciphertext(const Ciphertext* o) : logp(o->logp), logq(o->logq), N(o->N), n(o->n) {
+void Ciphertext::copy(const Ciphertext &o) {
+	assert(o.ax != NULL);
+	assert(o.bx != NULL);
+
+	clean();
+
+	logp = o.logp;
+	logq = o.logq;
+	N = o.N;
+	n = o.n;
 	ax = new ZZ[N];
 	bx = new ZZ[N];
 	for (long i = 0; i < N; ++i) {
-		ax[i] = o->ax[i];
-		bx[i] = o->bx[i];
+		ax[i] = o.ax[i];
+		bx[i] = o.bx[i];
 	}
 }
 
-Ciphertext::~Ciphertext() {
-	if(ax) delete[] ax;
-	if(bx) delete[] bx;
+void Ciphertext::clean() {
+	if (ax != NULL)
+		delete[] ax;
+	ax = NULL;
+
+	if (bx != NULL)
+		delete[] bx;
+	bx = NULL;
 }

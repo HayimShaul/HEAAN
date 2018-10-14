@@ -16,6 +16,9 @@ using namespace std;
 using namespace NTL;
 
 class Ciphertext {
+private:
+	void copy(const Ciphertext &o);
+	void clean();
 public:
 
 	ZZ* ax;
@@ -29,9 +32,13 @@ public:
 
 	Ciphertext(ZZ* ax = NULL, ZZ* bx = NULL, long logp = 0, long logq = 0, long N = 0, long n = 0);
 
-	Ciphertext(const Ciphertext* o);
+	Ciphertext(const Ciphertext* o) : ax(NULL), bx(NULL) { copy(*o); }
+	Ciphertext(const Ciphertext &o) : ax(NULL), bx(NULL) { copy(o); }
 
-	virtual ~Ciphertext();
+	virtual ~Ciphertext() { clean(); }
+
+	Ciphertext &operator=(const Ciphertext &o) { copy(o); return *this; }
+
 	
 };
 
